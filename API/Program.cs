@@ -1,12 +1,14 @@
 
+using Core.Interfaces;
 using Infrastructure.Data;
+using Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 
 namespace API
 {
 	public class Program
 	{
-		public static void Main(string[] args)
+		public static async Task Main(string[] args)
 		{
 			var builder = WebApplication.CreateBuilder(args);
 
@@ -22,6 +24,7 @@ namespace API
 						opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 				);
 
+			builder.Services.AddScoped<IProductRepository,ProductRepository>();
 
 			var app = builder.Build();
 
@@ -39,7 +42,26 @@ namespace API
 
 			app.MapControllers();
 
-			app.Run();
+
+			using var scope = app.Services.CreateScope();
+			var services = scope.ServiceProvider;
+			var context = services.GetRequiredService<EcommerceContext>();
+			// Create an instance of ILogger specifically for EcommerceCotextSeed
+			var loggerFactory = LoggerFactory.Create(builder => builder.AddConsole());
+			var logger = loggerFactory.CreateLogger<EcommerceContextSeed>();
+
+			try
+			{
+				await context.Database.MigrateAsync();
+
+				var ecommerceContextSeed = new EcommerceContextSeed(logger);
+				await ecommerceContextSeed.SeedDataAsync(context);
+            }
+			catch(Exception ex)
+			{
+				logger.LogError(ex, "An error occured during migration");
+			}
+            app.Run();
 		}
 	}
 }

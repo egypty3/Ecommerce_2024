@@ -40,14 +40,14 @@ namespace Infrastructure.Data.Repositories
                 .Include(p => p.ProductType)
                 .ToListAsync();
         }
-        public Task<IList<ProductBrand>> GetProductBrandsAsync()
+        public async Task<IList<ProductBrand>> GetProductBrandsAsync()
         {
-            throw new NotImplementedException();
+           return  await _context.ProductBrands.ToListAsync();
         }
 
-        public Task<IList<ProductType>> GetProductTypesAsync()
+        public async Task<IList<ProductType>> GetProductTypesAsync()
         {
-            throw new NotImplementedException();
+           return await _context.ProductTypes.ToListAsync();
         }
     }
 }
