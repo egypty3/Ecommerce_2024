@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 
 namespace Core.Entities
 {
-	public class ProductBrand // : BaseEntity
+	public class ProductBrand  : BaseEntity
 	{
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
+        public override int Id { get; set; }
         public string Name { get; set; }        
         
     }

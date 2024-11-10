@@ -16,15 +16,22 @@ namespace API.Controllers
     public class ProductsController : ControllerBase
     {
         //private readonly EcommerceContext _context;
-        private readonly IProductRepository _productRepository;
-
+        //private readonly IProductRepository _productRepository;
+        private readonly IGenericRepository<Product> _productRepository;
+        private readonly IGenericRepository<ProductType> _productTypeRepository;
+        private readonly IGenericRepository<ProductBrand> _productBrandRepository;
         //public ProductsController(EcommerceContext context)
         //{
         //    _context = context;
         //}
-        public ProductsController(IProductRepository productRepository)
+        public ProductsController(
+            IGenericRepository<Product> productRepository,
+            IGenericRepository<ProductType> productTypeRepository,
+            IGenericRepository<ProductBrand> productBrandRepository)
         {
             _productRepository = productRepository;
+            _productTypeRepository = productTypeRepository;
+            _productBrandRepository = productBrandRepository;
         }
 
         // GET: api/Products
@@ -32,7 +39,7 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
             //return await _context.Products.ToListAsync();
-            var products = await _productRepository.GetProductsAsync();
+            var products = await _productRepository.GetProductsAsync(p => p.ProductType,p => p.ProductBrand);
             return Ok(products);
         }
 
@@ -40,15 +47,9 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-            //var product = await _context.Products.FindAsync(id);
-
-            //if (product == null)
-            //{
-            //    return NotFound();
-            //}
-
-            //return product;
-            var product = await _productRepository.GetProductByIdAsync(id);
+           
+            var product = await _productRepository.GetProductByIdAsync(id,
+                p => p.ProductType, p => p.ProductBrand);
             return Ok(product);
         }
 
@@ -56,14 +57,14 @@ namespace API.Controllers
         public async Task<ActionResult<IEnumerable<ProductBrand>>> GetProductBrands()
         {
             return
-                Ok(await _productRepository.GetProductBrandsAsync());
+                Ok(await _productBrandRepository.GetProductBrandsAsync());
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IEnumerable<ProductType>>> GetProductTypes()
         {
             return
-                Ok(await _productRepository.GetProductTypesAsync());
+                Ok(await _productTypeRepository.GetProductTypesAsync());
         }
         //    // PUT: api/Products/5
         //    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

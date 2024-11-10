@@ -7,11 +7,11 @@ using System.Threading.Tasks;
 
 namespace Core.Entities
 {
-	public class ProductType //:BaseEntity
+	public class ProductType :BaseEntity
 	{
         // data annotate it as not and identity
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
-        public int Id { get; set; }
+        public override int Id { get; set; }
         public string Name { get; set; }
     }
 }

@@ -8,6 +8,7 @@ namespace Core.Entities
 {
 	public class BaseEntity
 	{
-		public int Id { get; set; }
+		
+		virtual public int Id { get; set; }
 	}
 }
