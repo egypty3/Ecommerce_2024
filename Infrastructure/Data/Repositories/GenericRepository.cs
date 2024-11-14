@@ -23,7 +23,8 @@ namespace Infrastructure.Data.Repositories
            return await _context.Set<T>().ToListAsync();
         }
 
-        public async Task<T> GetProductByIdAsync(int id, params Expression<Func<T, object>>[] includes)
+        public async Task<T> GetProductByIdAsync(int id, 
+            params Expression<Func<T, object>>[] includes)
         {
             IQueryable<T> query = _context.Set<T>();
             foreach (var include in includes)
@@ -39,7 +40,8 @@ namespace Infrastructure.Data.Repositories
             return entity;
         }
 
-        public async Task<IList<T>> GetProductsAsync(params Expression<Func<T, object>>[] includes)
+        public async Task<IList<T>> GetProductsAsync(
+            params Expression<Func<T,object>>[] includes)
         {
             IQueryable<T> query = _context.Set<T>();
             foreach (var include in includes)
