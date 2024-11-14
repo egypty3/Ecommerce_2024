@@ -8,6 +8,8 @@ using Microsoft.EntityFrameworkCore;
 using Core.Entities;
 using Infrastructure.Data;
 using Core.Interfaces;
+using Infrastructure.Data.Specifications;
+using Core.Specifications;
 
 namespace API.Controllers
 {
@@ -15,19 +17,15 @@ namespace API.Controllers
     [ApiController]
     public class ProductsController : ControllerBase
     {
-        //private readonly EcommerceContext _context;
-        //private readonly IProductRepository _productRepository;
-        private readonly IGenericRepository<Product> _productRepository;
-        private readonly IGenericRepository<ProductType> _productTypeRepository;
-        private readonly IGenericRepository<ProductBrand> _productBrandRepository;
-        //public ProductsController(EcommerceContext context)
-        //{
-        //    _context = context;
-        //}
+  
+        private readonly IRepository<Product> _productRepository;
+        private readonly IRepository<ProductType> _productTypeRepository;
+        private readonly IRepository<ProductBrand> _productBrandRepository;
+  
         public ProductsController(
-            IGenericRepository<Product> productRepository,
-            IGenericRepository<ProductType> productTypeRepository,
-            IGenericRepository<ProductBrand> productBrandRepository)
+            IRepository<Product> productRepository,
+            IRepository<ProductType> productTypeRepository,
+            IRepository<ProductBrand> productBrandRepository)
         {
             _productRepository = productRepository;
             _productTypeRepository = productTypeRepository;
@@ -38,8 +36,9 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
         {
-            //return await _context.Products.ToListAsync();
-            var products = await _productRepository.GetProductsAsync(p => p.ProductType,p => p.ProductBrand);
+            var spec = new ProductsWithTypesAndBrandsSpecification();   
+
+            var products = await _productRepository.ListAsync(spec);
             return Ok(products);
         }
 
@@ -47,24 +46,25 @@ namespace API.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Product>> GetProduct(int id)
         {
-           
-            var product = await _productRepository.GetProductByIdAsync(id,
-                p => p.ProductType, p => p.ProductBrand);
+           var spec = new ProductsWithTypesAndBrandsSpecification(id);
+            var product = await _productRepository.GetByIdAsync(spec);
             return Ok(product);
         }
 
         [HttpGet("brands")]
         public async Task<ActionResult<IEnumerable<ProductBrand>>> GetProductBrands()
         {
+            var spec = new BaseSpecification<ProductBrand>();
             return
-                Ok(await _productBrandRepository.GetProductBrandsAsync());
+                Ok(await _productBrandRepository.ListAsync( spec));
         }
 
         [HttpGet("types")]
         public async Task<ActionResult<IEnumerable<ProductType>>> GetProductTypes()
         {
+            var spec = new BaseSpecification<ProductType>();
             return
-                Ok(await _productTypeRepository.GetProductTypesAsync());
+                Ok(await _productTypeRepository.ListAsync(spec));
         }
         //    // PUT: api/Products/5
         //    // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754

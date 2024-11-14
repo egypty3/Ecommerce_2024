@@ -8,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Infrastructure.Data.Specifications
 {
-    public abstract class  BaseSpecificatio<T> : ISpecification<T>
+    public class  BaseSpecification<T> : ISpecification<T>
     {
         public Expression<Func<T, bool>> Criteria
         {
@@ -26,7 +26,7 @@ namespace Infrastructure.Data.Specifications
             Includes.Add(includeExpression);
         }
 
-        public void ApplyCriteria(Expression<Func<T, bool>> criteria)
+        public void SetCriteria(Expression<Func<T, bool>> criteria)
         {
             Criteria = criteria;
         }
