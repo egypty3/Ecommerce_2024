@@ -10,6 +10,8 @@ using Infrastructure.Data;
 using Core.Interfaces;
 using Infrastructure.Data.Specifications;
 using Core.Specifications;
+using API.DTOs;
+using AutoMapper;
 
 namespace API.Controllers
 {
@@ -18,6 +20,7 @@ namespace API.Controllers
     public class ProductsController : ControllerBase
     {
   
+        private readonly IMapper _mapper;
         private readonly IRepository<Product> _productRepository;
         private readonly IRepository<ProductType> _productTypeRepository;
         private readonly IRepository<ProductBrand> _productBrandRepository;
@@ -25,30 +28,63 @@ namespace API.Controllers
         public ProductsController(
             IRepository<Product> productRepository,
             IRepository<ProductType> productTypeRepository,
-            IRepository<ProductBrand> productBrandRepository)
+            IRepository<ProductBrand> productBrandRepository,
+            IMapper mapper)
         {
             _productRepository = productRepository;
             _productTypeRepository = productTypeRepository;
             _productBrandRepository = productBrandRepository;
+            _mapper = mapper;
         }
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<Product>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
             var spec = new ProductsWithTypesAndBrandsSpecification();   
 
             var products = await _productRepository.ListAsync(spec);
-            return Ok(products);
+
+
+            // without automapper
+
+            //var productsDTO = products.Select(product => new ProductDTO
+            //{
+            //    Id = product.Id,
+            //    Name = product.Name,
+            //    Price = product.Price,
+            //    PictureUrl = product.PictureUrl,
+            //    ProductBrand = product.ProductBrand.Name,
+            //    ProductType = product.ProductType.Name
+            //}
+            //);
+
+            var productDTOs = _mapper.Map<List<ProductDTO>>(products);
+
+            return Ok(productDTOs);
         }
 
         // GET: api/Products/5
         [HttpGet("{id}")]
-        public async Task<ActionResult<Product>> GetProduct(int id)
+        public async Task<ActionResult<ProductDTO>> GetProduct(int id)
         {
            var spec = new ProductsWithTypesAndBrandsSpecification(id);
             var product = await _productRepository.GetByIdAsync(spec);
-            return Ok(product);
+
+
+            // without automapper
+
+            //var productDTO = new ProductDTO
+            //{
+            //    Id = product.Id,
+            //    Name = product.Name,               
+            //    Price = product.Price,
+            //    PictureUrl = product.PictureUrl,
+            //    ProductBrand = product.ProductBrand.Name,
+            //    ProductType = product.ProductType.Name
+            //};
+            var productDTO = _mapper.Map<Product, ProductDTO>(product);
+            return Ok(productDTO);
         }
 
         [HttpGet("brands")]

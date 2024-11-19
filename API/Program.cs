@@ -1,4 +1,5 @@
 
+using API.Mappings;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
@@ -26,6 +27,9 @@ namespace API
 
 			//builder.Services.AddScoped<IProductRepository,ProductRepository>();
 			builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+			//builder.Services.AddAutoMapper(typeof(MappingProfiles));
 			var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
