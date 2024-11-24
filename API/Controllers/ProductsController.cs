@@ -39,9 +39,11 @@ namespace API.Controllers
 
         // GET: api/Products
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
+        public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts(string sort,int skip = 0,int take= 10,
+            int? productTypeId = null,int? productBrandId = null , string search = "", decimal? price = null)
         {
-            var spec = new ProductsWithTypesAndBrandsSpecification("pricedesc");   
+            var spec = new ProductsWithTypesAndBrandsSpecification(sort,skip,take,
+                productTypeId,productBrandId,search,price);   
 
             var products = await _productRepository.ListAsync(spec);
 

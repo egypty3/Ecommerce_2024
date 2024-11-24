@@ -10,7 +10,7 @@ namespace Core.Specifications
 {
     public interface ISpecification<T>
     {
-        Expression<Func<T, bool>> Criteria { get; }
+        List<Expression<Func<T, bool>>> Criteria { get; }
 
         // p => p.price > 20
         // p.brand == "Addidas"
@@ -20,5 +20,8 @@ namespace Core.Specifications
         Expression<Func<T, object>> OrderBy { get; }
 
         OrderBy OrderByDirection { get; }
+        int Take { get; }
+        int Skip { get; }
+        bool IsPagingEnabled { get; }
     }
 }

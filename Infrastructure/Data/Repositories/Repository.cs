@@ -31,9 +31,12 @@ namespace Infrastructure.Data.Repositories
         {
             var query = _context.Set<T>().AsQueryable();
 
-            if (spec.Criteria != null)
+            if (spec.Criteria != null && spec.Criteria.Any())
             {
-                query = query.Where(spec.Criteria);
+                foreach (var criteria in spec.Criteria)
+                {
+                    query = query.Where(criteria);
+                }
             }
 
             foreach (var include in spec.Includes)
@@ -51,6 +54,10 @@ namespace Infrastructure.Data.Repositories
                 {
                     query = query.OrderByDescending(spec.OrderBy);
                 }
+            }
+            if (spec.IsPagingEnabled)
+            {
+                query = query.Skip(spec.Skip).Take(spec.Take);
             }
 
             return query;

@@ -10,10 +10,41 @@ namespace Infrastructure.Data.Specifications
 {
     public class ProductsWithTypesAndBrandsSpecification : BaseSpecification<Product>
     {
-        public ProductsWithTypesAndBrandsSpecification(string sort)
+        public ProductsWithTypesAndBrandsSpecification(string sort, int skip, int take,
+            int? productTypeId, int? productBrandId, string search, decimal? price)
         {
             AddInclude(p => p.ProductType);
             AddInclude(p => p.ProductBrand);
+
+            if (productTypeId.HasValue)
+            {
+                AddCriteria(p => p.ProductTypeId == productTypeId.Value);
+            }
+
+            if (productBrandId.HasValue)
+            {
+                AddCriteria(p => p.ProductBrandId == productBrandId.Value);
+            }
+
+            if (!string.IsNullOrEmpty(search))
+            {
+                AddCriteria(p =>
+                    p.Name.ToLower().Contains(
+                        search.ToLower())
+                );
+            }
+
+            if (price.HasValue)
+            {
+                AddCriteria(p => p.Price > price.Value);
+            }
+
+
+            if (skip >= 0 && take > 0)
+            {
+                ApplyPaging(skip, take);
+            }
+
             ApplyOrderBy(p => p.Name, Core.Enums.OrderBy.Ascending);
 
             if (!string.IsNullOrEmpty(sort))
@@ -39,21 +70,21 @@ namespace Infrastructure.Data.Specifications
         {
             AddInclude(p => p.ProductType);
             AddInclude(p => p.ProductBrand);
-            SetCriteria(p => p.Price > price);
+            AddCriteria(p => p.Price > price);
         }
 
         public ProductsWithTypesAndBrandsSpecification()
         {
             AddInclude(p => p.ProductType);
             AddInclude(p => p.ProductBrand);
-           
+
         }
 
         public ProductsWithTypesAndBrandsSpecification(int id)
         {
             AddInclude(p => p.ProductType);
             AddInclude(p => p.ProductBrand);
-            SetCriteria(p => p.Id == id);
+            AddCriteria(p => p.Id == id);
         }
     }
 }
