@@ -40,6 +40,19 @@ namespace Infrastructure.Data.Repositories
             {
                 query = query.Include(include);
             }
+
+            if (spec.OrderBy != null)
+            {
+                if (spec.OrderByDirection == Core.Enums.OrderBy.Ascending)
+                {
+                    query = query.OrderBy(spec.OrderBy);
+                }
+                else if (spec.OrderByDirection == Core.Enums.OrderBy.Descending)
+                {
+                    query = query.OrderByDescending(spec.OrderBy);
+                }
+            }
+
             return query;
         }
     }

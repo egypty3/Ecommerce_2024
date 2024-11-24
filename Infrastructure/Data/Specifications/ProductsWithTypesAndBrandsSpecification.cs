@@ -10,6 +10,31 @@ namespace Infrastructure.Data.Specifications
 {
     public class ProductsWithTypesAndBrandsSpecification : BaseSpecification<Product>
     {
+        public ProductsWithTypesAndBrandsSpecification(string sort)
+        {
+            AddInclude(p => p.ProductType);
+            AddInclude(p => p.ProductBrand);
+            ApplyOrderBy(p => p.Name, Core.Enums.OrderBy.Ascending);
+
+            if (!string.IsNullOrEmpty(sort))
+            {
+                switch (sort)
+                {
+                    case "priceasc":
+                        ApplyOrderBy(p => p.Price, Core.Enums.OrderBy.Ascending);
+                        break;
+                    case "pricedesc":
+                        ApplyOrderBy(p => p.Price, Core.Enums.OrderBy.Descending);
+                        break;
+                    case "namedesc":
+                        ApplyOrderBy(p => p.Name, Core.Enums.OrderBy.Descending);
+                        break;
+                    default:
+                        ApplyOrderBy(p => p.Name, Core.Enums.OrderBy.Ascending);
+                        break;
+                }
+            }
+        }
         public ProductsWithTypesAndBrandsSpecification(decimal price)
         {
             AddInclude(p => p.ProductType);

@@ -41,7 +41,7 @@ namespace API.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts()
         {
-            var spec = new ProductsWithTypesAndBrandsSpecification();   
+            var spec = new ProductsWithTypesAndBrandsSpecification("pricedesc");   
 
             var products = await _productRepository.ListAsync(spec);
 
