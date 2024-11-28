@@ -4,6 +4,7 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
+using StackExchange.Redis;
 
 namespace API
 {
@@ -25,8 +26,16 @@ namespace API
 						opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"))
 				);
 
-			//builder.Services.AddScoped<IProductRepository,ProductRepository>();
-			builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+			builder.Services.AddSingleton<IConnectionMultiplexer>(
+				c =>
+				{
+					var config = builder.Configuration.GetConnectionString("Redis");
+					return ConnectionMultiplexer.Connect(config);
+                }
+			);
+            //builder.Services.AddScoped<IProductRepository,ProductRepository>();
+            builder.Services.AddScoped<IBasketRepository, BasketRepository>();
+            builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 			//builder.Services.AddAutoMapper(typeof(MappingProfiles));
