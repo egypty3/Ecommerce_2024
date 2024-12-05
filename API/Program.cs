@@ -1,8 +1,10 @@
 
 using API.Mappings;
+using Core.Entities.Identity;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
 
@@ -38,8 +40,13 @@ namespace API
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
-			//builder.Services.AddAutoMapper(typeof(MappingProfiles));
-			var app = builder.Build();
+
+			builder.Services.AddIdentity<ApplicationUser,IdentityRole>()
+                .AddEntityFrameworkStores<EcommerceContext>()
+                .AddDefaultTokenProviders();
+
+            //builder.Services.AddAutoMapper(typeof(MappingProfiles));
+            var app = builder.Build();
 
 			// Configure the HTTP request pipeline.
 			if (app.Environment.IsDevelopment())
@@ -69,6 +76,7 @@ namespace API
 
 				var ecommerceContextSeed = new EcommerceContextSeed(logger);
 				await ecommerceContextSeed.SeedDataAsync(context);
+				await ApplicationIdentityContextSeed.SeedAsync(services);
             }
 			catch(Exception ex)
 			{
