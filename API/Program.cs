@@ -4,6 +4,7 @@ using Core.Entities.Identity;
 using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
+using Infrastructure.Services;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StackExchange.Redis;
@@ -35,11 +36,15 @@ namespace API
 					return ConnectionMultiplexer.Connect(config);
                 }
 			);
+
+			builder.Services.Configure<TokenSettings>(builder.Configuration.GetSection("TokenSettings"));
+
             //builder.Services.AddScoped<IProductRepository,ProductRepository>();
             builder.Services.AddScoped<IBasketRepository, BasketRepository>();
             builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+			builder.Services.AddScoped<ITokenGenerationService, TokenGenerationService>();
 
-			builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
+            builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 
 			builder.Services.AddIdentity<ApplicationUser,IdentityRole>()
                 .AddEntityFrameworkStores<EcommerceContext>()

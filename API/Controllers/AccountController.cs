@@ -1,6 +1,7 @@
 ﻿using API.DTOs;
 using AutoMapper;
 using Core.Entities.Identity;
+using Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -16,14 +17,18 @@ namespace API.Controllers
         private readonly UserManager<ApplicationUser> _userManager;
         private readonly SignInManager<ApplicationUser> _signInManager;        
         private readonly IMapper _mapper;
+        private readonly ITokenGenerationService _tokenService;
+
         public AccountController(
             UserManager<ApplicationUser> userManager,
             SignInManager<ApplicationUser> signInManager,
-             IMapper mapper)
+             IMapper mapper,
+             ITokenGenerationService tokenService)
         {
             _mapper = mapper;            
             _signInManager = signInManager;
             _userManager = userManager;
+            _tokenService = tokenService;
         }
 
         [HttpPost("login")]
@@ -51,8 +56,12 @@ namespace API.Controllers
                     // Add more claims as needed
                 };
 
-                //var token = _tokenService.CreateToken(user, tokenClaims);
-                return Ok();
+                var token = _tokenService.GenerateToken(tokenClaims);
+                return Ok(new
+                {
+                    Message = "Login successful",
+                    Token = token
+                });
             }
           
             if (result.RequiresTwoFactor)
