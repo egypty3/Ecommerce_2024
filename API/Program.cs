@@ -5,9 +5,12 @@ using Core.Interfaces;
 using Infrastructure.Data;
 using Infrastructure.Data.Repositories;
 using Infrastructure.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 using StackExchange.Redis;
+using System.Text;
 
 namespace API
 {
@@ -50,6 +53,32 @@ namespace API
                 .AddEntityFrameworkStores<EcommerceContext>()
                 .AddDefaultTokenProviders();
 
+			builder.Services.AddAuthentication(
+				options =>
+                        {
+                            options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
+                            options.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
+                            options.DefaultChallengeScheme = JwtBearerDefaults.AuthenticationScheme;
+                        }
+
+                ).AddJwtBearer(
+					option =>
+                    {
+                       var tokenSettings = builder.Configuration.GetSection("TokenSettings").Get<TokenSettings>();
+                        option.SaveToken = true;
+                        option.TokenValidationParameters = new TokenValidationParameters
+                        {
+							//ValidateIssuer = true,
+							ValidateLifetime = true,
+							ValidateIssuerSigningKey = true,
+                            //ValidateAudience = true,
+                            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(tokenSettings.Key)),
+                            //ValidIssuer = tokenSettings.Issuer,
+                            //ValidAudience = tokenSettings.Audience,
+                        };
+                    }
+                );
+
             //builder.Services.AddAutoMapper(typeof(MappingProfiles));
             var app = builder.Build();
 
@@ -62,7 +91,8 @@ namespace API
 
 			app.UseHttpsRedirection();
 
-			app.UseAuthorization();
+			app.UseAuthentication();
+            app.UseAuthorization();
 
 
 			app.MapControllers();

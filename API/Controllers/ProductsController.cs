@@ -12,11 +12,13 @@ using Infrastructure.Data.Specifications;
 using Core.Specifications;
 using API.DTOs;
 using AutoMapper;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    
     public class ProductsController : ControllerBase
     {
   
@@ -40,6 +42,7 @@ namespace API.Controllers
         // GET: api/Products
         
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<ProductDTO>>> GetProducts(string sort,int skip = 0,int take= 10,
             int? productTypeId = null,int? productBrandId = null , string search = "", decimal? price = null)
         {
@@ -69,6 +72,7 @@ namespace API.Controllers
 
         // GET: api/Products/5
         [HttpGet("{id}")]
+        [Authorize]
         public async Task<ActionResult<ProductDTO>> GetProduct(int id)
         {
            var spec = new ProductsWithTypesAndBrandsSpecification(id);

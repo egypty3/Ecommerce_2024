@@ -76,36 +76,22 @@ namespace API.Controllers
         }
 
 
+        [HttpPost("register")]
+        public async Task<ActionResult> Register(RegisterDto model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var user = _mapper.Map<ApplicationUser>(model);
 
-        //[HttpPost("register")]
-        //public async Task<ActionResult<UserDto>> Register(RegisterDto registerDto)
-        //{
-        //    var user = new ApplicationUser
-        //    {
-        //        DisplayName = registerDto.DisplayName,
-        //        Email = registerDto.Email,
-        //        UserName = registerDto.Email
-        //    };
-        //    var result = await _userManager.CreateAsync(user, registerDto.Password);
-        //    if (!result.Succeeded) return BadRequest(new ApiResponse(400));
-        //    return new UserDto
-        //    {
-        //        Email = user.Email,
-        //        Token = _tokenService.CreateToken(user),
-        //        DisplayName = user.DisplayName
-        //    };
-        //}
-        //[Authorize]
-        //[HttpGet]
-        //public async Task<ActionResult<UserDto>> GetCurrentUser()
-        //{
-        //    var user = await _userManager.FindByEmailFromClaimsPrinciple(HttpContext.User);
-        //    return new UserDto
-        //    {
-        //        Email = user.Email,
-        //        Token = _tokenService.CreateToken(user),
-        //        DisplayName = user.DisplayName
-        //    };
-        //}
+            var result = await _userManager.CreateAsync(user, model.Password);
+
+            if (result.Succeeded)
+            {
+                return Ok(new { Message = "User created successfully" });
+            }
+            return BadRequest(new { Message = "Failed to create user" });
+        }
     }
 }
